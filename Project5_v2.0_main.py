@@ -150,7 +150,6 @@ if "generated_password" in st.session_state:
             }])
 
             if os.path.exists(file_name):
-                # Using engine='openpyxl' ensures compatibility on the server
                 old_df = pd.read_excel(file_name, engine='openpyxl')
                 df = pd.concat([old_df, new_row], ignore_index=True)
             else:
@@ -170,31 +169,20 @@ if st.session_state.show_saved and os.path.exists(file_name):
 
     excel_data = pd.read_excel(file_name, engine='openpyxl')
 
-    text_colors = ["#FF5733", "#33FF57", "#3357FF", "#F333FF", "#FF33A1", "#33FFF5", "#FF8333", "#8D33FF"]
-
     if not excel_data.empty:
-        # UPDATED RATIOS: Increased from [2, 2, 3, 3, 1] to [2, 3, 4, 5, 1] for more space
-        h1, h2, h3, h4, h5 = st.columns([2, 3, 4, 5, 1])
-        h1.write("**Name**")
-        h2.write("**Password**")
-        h3.write("**Date**")
-        h4.write("**App/Web**")
-        h5.write("**Action**")
+        # Use st.dataframe for mobile responsiveness (prevents stacking)
+        st.dataframe(excel_data, use_container_width=True, hide_index=True)
 
-        for index, row in excel_data.iterrows():
-            # Apply the same wider ratios here
-            c1, c2, c3, c4, c5 = st.columns([2, 3, 4, 5, 1])
-            c1.write(row["Name"])
-            c2.markdown(f"<b style='color:{random.choice(text_colors)}'>{row['Password']}</b>", unsafe_allow_html=True)
-            c3.write(row["Date & Time"])
-            c4.markdown(f"<b style='color:{random.choice(text_colors)}'>{row['App / Website Name']}</b>",
-                        unsafe_allow_html=True)
-
-            if c5.button("🗑", key=f"delete_{index}"):
-                excel_data.drop(index, inplace=True)
-                excel_data.reset_index(drop=True, inplace=True)
-                excel_data.to_excel(file_name, index=False, engine='openpyxl')
-                st.rerun()
+        # Separate deletion section for better mobile accessibility
+        with st.expander("🗑 Delete Passwords"):
+            for index, row in excel_data.iterrows():
+                del_c1, del_c2 = st.columns([4, 1])
+                del_c1.write(f"**{row['App / Website Name']}** ({row['Name']})")
+                if del_c2.button("🗑", key=f"delete_{index}"):
+                    excel_data.drop(index, inplace=True)
+                    excel_data.reset_index(drop=True, inplace=True)
+                    excel_data.to_excel(file_name, index=False, engine='openpyxl')
+                    st.rerun()
     else:
         st.info("No saved passwords found.")
 
