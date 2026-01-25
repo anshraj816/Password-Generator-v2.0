@@ -113,7 +113,7 @@ numbers = list("0123456789")
 symbols = ['!', '@', '#', '$', '%', '^', '&', '*', ',', '+']
 
 # ================= UI =================
-st.title("Welcome to my Project Number 5 🔐")
+st.title("Welcome to my Project Number 5 v2.0 🔐")
 
 name = st.text_input("Please enter your name")
 
