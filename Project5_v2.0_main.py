@@ -29,6 +29,31 @@ def get_base64_video(video_path):
     with open(video_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+# ================= NEON BUTTON STYLING =================
+# This CSS adds a neon glow to all buttons and ensures text is sharp
+st.markdown("""
+    <style>
+    div.stButton > button {
+        border: 2px solid #00f2ff !important;
+        border-radius: 10px !important;
+        color: white !important;
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        font-weight: bold !important;
+        text-shadow: 0 0 10px #00f2ff, 0 0 20px #00f2ff !important;
+        box-shadow: 0 0 10px #00f2ff, inset 0 0 5px #00f2ff !important;
+        transition: 0.3s all ease-in-out !important;
+    }
+    div.stButton > button:hover {
+        box-shadow: 0 0 20px #00f2ff, inset 0 0 10px #00f2ff !important;
+        transform: scale(1.02) !important;
+    }
+    /* Specific styling for the 'Generate' button to make it even more visible */
+    div.stButton > button:active {
+        background-color: #00f2ff !important;
+        color: black !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # ================= CSS THEMES (FIXED VISIBILITY) =================
 if st.session_state.theme == "winter":
@@ -52,11 +77,6 @@ if st.session_state.theme == "winter":
                 color: white !important;
                 text-shadow: 2px 2px 10px black;
             }}
-            div.stButton > button {{
-                background-color: rgba(255,255,255,0.2);
-                color: white !important;
-                border: 1px solid white;
-            }}
             </style>
 
             <video autoplay loop muted playsinline id="bg-video">
@@ -72,15 +92,6 @@ elif st.session_state.theme == "dark":
         .stApp { background-color: #0e1117; color: white; }
         label, .stMarkdown p, .stSubheader, .stTitle {
             color: white !important;
-        }
-        div.stButton > button {
-            background-color: #262730;
-            color: white !important;
-            border: 1px solid #4d4d4d;
-        }
-        div.stButton > button:hover {
-            border-color: #ff4b4b;
-            color: #ff4b4b !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -170,10 +181,8 @@ if st.session_state.show_saved and os.path.exists(file_name):
     excel_data = pd.read_excel(file_name, engine='openpyxl')
 
     if not excel_data.empty:
-        # Use st.dataframe for mobile responsiveness (prevents stacking)
         st.dataframe(excel_data, use_container_width=True, hide_index=True)
 
-        # Separate deletion section for better mobile accessibility
         with st.expander("🗑 Delete Passwords"):
             for index, row in excel_data.iterrows():
                 del_c1, del_c2 = st.columns([4, 1])
